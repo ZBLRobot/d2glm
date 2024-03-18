@@ -1,0 +1,154 @@
+# Transformer的生态系统
+
+Transformer模型代表了一种范式变革，它们需要一个新的名称来描述：基座模型（Foundation Model）。为此，斯坦福大学成立了基座模型研究中心（CRFM）。2021年8月，CRFM发布了一份由100多名科学家和专业人士撰写的长达200页的论文（请参见参考文献部分）：*On the Opportunities and Risks of Foundation Models*（《关于基座模型的机遇与风险》）。
+
+基座模型并非由学术界创建，而是由大型科技公司创建的。例如，谷歌发明了transformer模型，并由此推出了Google BERT。微软与OpenAI合作推出了GPT-3。这些大型科技公司在基座模型的研发和推广方面发挥了重要作用。
+
+大型科技公司需要找到更好的模型来应对流入其数据中心的以PB计的数据呈指数增长。因此，transformer模型是出于必要性而诞生的。它们应运而生，以应对海量数据的处理需求。
+
+让我们首先考虑工业4.0，以理解为何需要工业化的人工智能。
+
+## 工业4.0
+
+农业革命引发了第一次工业革命，引入了机械化。第二次工业革命诞生了电力、电话和飞机。第三次工业革命是数字化。
+
+第四次工业革命，即工业4.0，孕育了无数的机器对机器连接：机器人、机器人、物联网设备、自动驾驶汽车、智能手机、从社交媒体存储中收集数据的机器人等等。
+
+反过来，这些数以百万计的机器和机器人每天生成数十亿条数据记录，包含图像、声音、文字和事件等。
+
+<!-- 图改文 -->
+工业4.0的影响和范畴包含了以下几个方面：
+- 制造业中机器对机器的连接
+- 物流业中车辆到仓库的连接
+- 卡车到轮船或飞机的交通连接
+- AI或经典的自动化微决策
+- 物联网及所有联网设备、社交媒体中服务器对服务器的连接和处理
+- 经典软件和基于基座模型AI的产业化
+
+工业4.0需要能够在人类历史上前所未有的大规模数据面前，处理数据并做出决策的智能算法，而无需人类干预。
+
+大型科技公司需要找到一个单一的人工智能模型，能够执行过去需要多个独立算法完成的各种任务。
+
+## 基座模型
+
+Transformer模型具有两个鲜明的特点：高度的同质化（Homogenization）和令人惊叹的涌现特性（Emergence Properties）。同质化使得可以使用一个模型来执行各种各样的任务。这些能力是通过在超级计算机上训练数十亿级参数的模型而出现的。
+
+<!-- 图改文 -->
+范式的改变使得基座模型成为一个后深度学习生态系统，新的AI范式或者说工业4.0时代的AI专家的范畴包括以下几个方面：
+- 可以独立完成所有NLP、CV和更多任务的基座模型
+- 可以完成一个或几个任务的部分训练transformer模型
+- 经典的深度学习任务
+- 经典的机器学习算法（LR, KNN, KMC, MDP等）
+- 专家系统和规则库
+- 帮助构建AI流水线的代码编写
+
+基座模型虽然采用了创新的架构，但是它们仍然建立在人工智能的历史之上。因此，人工智能专家的技能范围正在强有力地扩展！
+
+当前的Transformer模型生态系统与人工智能的其他演进方式不同，并可以总结为四方面的特点：
+
+- 模型架构（Model Architecture）
+
+  Transformer模型是工业级的。模型的每一层是相同的，并且它们专门设计用于并行处理。我们将在“:ref:`chapter-2`”中详细介绍Transformer的架构。
+
+- 数据（Data）
+
+  大型科技公司拥有人类历史上最庞大的数据来源，这些数据首先由第三次工业革命（数字化）产生，并通过工业4.0的推动而增长到难以想象的规模。
+
+- 算力（Computing Power）
+
+  大型科技公司拥有以前从未见过的规模的计算能力。例如，GPT-3的训练速度约为50P次浮点运算每秒（PFlops/s），而谷歌现在拥有领域特定的超级计算机，其运算速度超过80PFlops/s。
+
+- 提示工程（Prompt Engineering）
+
+  经过高度训练的Transformer模型可以通过提示词来执行各种不同的任务。提示词以自然语言形式输入。然而，所使用的词汇需要一定的结构，使得提示词成为一种元语言，从而出现了基于基座模型的提示工程。
+
+因此，Transformer基座模型是在超级计算机上使用十亿级的数据和十亿级的参数进行训练的Transformer模型。该模型可以在没有进一步微调的情况下执行各种任务。因此，基座模型的规模是独特的。这些完全训练好的模型通常被称为引擎。只有GPT-3、Google BERT和少数几个Transformer引擎才能够被称为基座模型。
+
+本书中提到的OpenAI的GPT-3或Google的BERT等模型仅代表其基座模型。这是因为GPT-3和Google BERT在超级计算机上进行了全面训练。尽管其他模型在有限的使用场景中可能很有趣且有效，但由于资源不足，它们无法达到基座模型的同质化水平。
+
+现在让我们来探索一个基座模型是如何工作的，并且它们如何改变了我们开发程序的方式的例子。
+
+## 编程是否成为了NLP的一个子领域？
+
+Chen等人（2021年）在2021年8月发表了一篇轰动性的论文，介绍了Codex，这是一个能够将自然语言转换为源代码的GPT-3模型。Codex是在5400万个公共GitHub软件仓库上进行训练的。Codex可以生成有趣的自然语言到源代码的转换结果，我们将在第16章“:ref:`chapter-16`”中看到具体示例。
+
+编程是否是已经成为一种将自然语言翻译为源代码语言的机器翻译任务？
+
+编程是否正在成为针对GPT-3引擎的NLP任务？
+
+在回答这些问题之前，让我们先看一个例子。
+
+由于Codex是一种随机算法，我们需要一些技巧来构建元语言。如果不能正确构建提示语（Prompt），可能无法生成所期望的结果。
+
+这里创建了一些用于Codex实验的提示语。这些例子只是为了让读者了解Codex的工作原理，并且纯粹是为了教育目的。提示语如下：
+
+- “generate a random distribution of 200 integers between 1 and 100” in Python
+- “plot the data using matplotlib”
+- “create a k-means clustering model with 3 centroids and fit the model”
+- “print the cluster labels”
+- “plot the clusters”
+- “plot the clusters with centroids”
+
+Codex自动将这些使用自然元语言编写的提示语翻译成了Python代码！
+
+由于Codex是一种随机模型，所以如果重复进行实验，它可能无法完全复现相同的代码。我们需要通过实验来学习并驾驭这种元语言。
+
+在提供提示语后，Codex会自动生成Python程序，并且可以复制和测试：
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.datasets.samples_generator import make_blobs
+
+
+# generate random data
+np.random.seed(0)
+X, y = make_blobs(n_samples=200, centers=3, n_features=2, cluster_std=2,
+random_state=0)
+
+# plot the data
+plt.scatter(X[:, 0], X[:, 1], s=50)
+plt.show()
+
+# create the k-means model
+kmeans = KMeans(n_clusters=3, random_state=0)
+
+# fit the model to the data
+kmeans.fit(X)
+
+# print the cluster labels
+print(kmeans.labels_)
+
+#plot the clusters
+plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='rainbow')
+plt.show()
+
+# plot the clusters with centroids
+plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='rainbow')
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1],
+c='black', s=100, alpha=0.5)
+plt.show()
+```
+
+上述程序在Python解释器是可以运行的（前提是需要的库都已安装好）。读者也可以尝试JavaScript等其他语言上的实验。可以在[poe.com](https://poe.com/AICodeX)上搜索AICodeX进行简单的尝试。
+
+GitHub Copilot现在可与一些Microsoft开发工具一起使用，我们将在“:ref:`chapter-16`”中看到。学习提示工程的元语言可以减少利用Copilot来进行开发的时间。
+
+如果终端用户掌握了元语言，他们就可以创建一些软件原型和较小的任务。未来，编程Copilot的功能将会继续扩展。
+
+在第“:ref:`chapter-16`”中，我们将了解Codex在人工智能的未来中的定位。
+
+现在，让我们来展望一下人工智能专家的光明未来吧。
+
+## 人工智能专家的未来
+
+基础模型的社会影响不容小觑。提示语的构建已成为人工智能专家所必需的技能。然而，人工智能专家的未来不能仅仅局限于Transformer模型。在工业4.0时代，人工智能和数据科学相互交叉重叠。
+
+人工智能专家将涉及使用传统人工智能、物联网（IoT）、边缘计算等技术进行机器之间算法的开发。人工智能专家还将使用传统算法设计和开发有趣的连接，将机器人、服务器和各种类型的连接设备进行连接。
+
+因此，本书不仅限于提示语构建，还涵盖了成为“工业4.0人工智能专家”或“I4.0人工智能专家”所需的广泛设计技能。
+
+提示语构建是人工智能专家需要开发的设计技能的一部分。在本书中，我将因此将未来的人工智能专家称为“工业4.0人工智能专家”。
+
+现在让我们对Transformer如何优化自然语言处理模型进行一个整体的概览。
