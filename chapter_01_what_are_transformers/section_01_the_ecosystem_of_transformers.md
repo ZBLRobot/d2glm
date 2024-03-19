@@ -82,12 +82,12 @@ Chen等人（2021年）在2021年8月发表了一篇轰动性的论文，介绍�
 
 这里创建了一些用于Codex实验的提示语。这些例子只是为了让读者了解Codex的工作原理，并且纯粹是为了教育目的。提示语如下：
 
-- “generate a random distribution of 200 integers between 1 and 100” in Python
-- “plot the data using matplotlib”
-- “create a k-means clustering model with 3 centroids and fit the model”
-- “print the cluster labels”
-- “plot the clusters”
-- “plot the clusters with centroids”
+- 在Python中生成一个1到100之间的200个整数的随机分布。
+- 使用matplotlib绘制数据图表。
+- 创建一个包含3个中心点的K均值聚类模型，并拟合该模型。
+- 打印聚类标签。
+- 绘制聚类结果图表。
+- 绘制带有中心点的聚类图表。
 
 Codex自动将这些使用自然元语言编写的提示语翻译成了Python代码！
 
@@ -96,38 +96,42 @@ Codex自动将这些使用自然元语言编写的提示语翻译成了Python代
 在提供提示语后，Codex会自动生成Python程序，并且可以复制和测试：
 
 ```python
-import numpy as np
+import random
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.datasets.samples_generator import make_blobs
 
+# 生成随机分布的整数
+random_numbers = [random.randint(1, 100) for _ in range(200)]
 
-# generate random data
-np.random.seed(0)
-X, y = make_blobs(n_samples=200, centers=3, n_features=2, cluster_std=2,
-random_state=0)
-
-# plot the data
-plt.scatter(X[:, 0], X[:, 1], s=50)
+# 绘制数据图表
+plt.scatter(range(200), random_numbers)
+plt.title("Random Integer Distribution")
+plt.xlabel("Index")
+plt.ylabel("Value")
 plt.show()
 
-# create the k-means model
-kmeans = KMeans(n_clusters=3, random_state=0)
+# 创建K均值聚类模型并拟合数据
+kmeans = KMeans(n_clusters=3)
+kmeans.fit([[x] for x in random_numbers])
 
-# fit the model to the data
-kmeans.fit(X)
+# 打印聚类标签
+labels = kmeans.labels_
+print("Cluster Labels:", labels)
 
-# print the cluster labels
-print(kmeans.labels_)
-
-#plot the clusters
-plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='rainbow')
+# 绘制聚类结果图表
+plt.scatter(range(200), random_numbers, c=labels)
+plt.title("Clustering Results")
+plt.xlabel("Index")
+plt.ylabel("Value")
 plt.show()
 
-# plot the clusters with centroids
-plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='rainbow')
-plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1],
-c='black', s=100, alpha=0.5)
+# 绘制带有中心点的聚类图表
+centroids = kmeans.cluster_centers_
+plt.scatter(range(200), random_numbers, c=labels)
+plt.scatter(range(3), centroids, c='red', marker='x')
+plt.title("Clustering Results with Centroids")
+plt.xlabel("Index")
+plt.ylabel("Value")
 plt.show()
 ```
 
@@ -143,7 +147,7 @@ GitHub Copilot现在可与一些Microsoft开发工具一起使用，我们将在
 
 ## 人工智能专家的未来
 
-基础模型的社会影响不容小觑。提示语的构建已成为人工智能专家所必需的技能。然而，人工智能专家的未来不能仅仅局限于Transformer模型。在工业4.0时代，人工智能和数据科学相互交叉重叠。
+基座模型的社会影响不容小觑。提示语的构建已成为人工智能专家所必需的技能。然而，人工智能专家的未来不能仅仅局限于Transformer模型。在工业4.0时代，人工智能和数据科学相互交叉重叠。
 
 人工智能专家将涉及使用传统人工智能、物联网（IoT）、边缘计算等技术进行机器之间算法的开发。人工智能专家还将使用传统算法设计和开发有趣的连接，将机器人、服务器和各种类型的连接设备进行连接。
 
