@@ -26,3 +26,9 @@
   * 3、sudo apt install build-essential
   * 4、sudo apt install texlive-latex-extra texlive-extra-utils texlive-xetex texlive-lang-chinese
   * 5、进一步设置和使用请参考：https://book.d2l.ai/
+
+使用Jupyter编辑markdown
+
+  * pip install jupytext
+  * 重启jupyter：jupyter lab
+  * 新建：Jupytext->MyST Markdown文件
