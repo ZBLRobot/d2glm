@@ -1,4 +1,5 @@
 # 什么是Transformer?
+:label:`chapter-1`
 
 Transformer是一种工业化、同质化的后深度学习模型（Post-Deep Learning Model），专为超级计算机上的并行计算而设计。通过将各种任务进行同质化（Homogenization），Transformer模型可以执行多种任务，而无需在特定任务上进行微调训练（Fine-tuning）。Transformer可以利用十亿级的参数对十亿级的原始未标记数据记录执行自监督学习（Self-supervised Learning）。
 
@@ -18,7 +19,7 @@ Transformer是一种工业化、同质化的后深度学习模型（Post-Deep Le
 
 本章涵盖以下主题：
 - 第四次工业革命，工业4.0的出现
-- 基础模型的范式变革
+- 基座模型的范式变革
 - 引入新技能：提示工程
 - transformer的背景知识
 - 实施transformer的挑战

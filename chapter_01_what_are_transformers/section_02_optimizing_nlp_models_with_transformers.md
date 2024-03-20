@@ -2,14 +2,14 @@
 
 近十年来，循环神经网络（Recurrent Neural Networks, RNN）及其变体长短期记忆网络（Long Short-Term Memory, LSTM）将神经网络应用到了NLP序列模型中。然而，循环机制在处理长序列和大量参数时其能力会受限。因此，目前的最先进的Transformer模型在NLP中占据了主导地位。
 
-这一节简要介绍了NLP中促成Transformer模型发展的背景，我们将在“:ref:`sec-2`”中更详细地描述这一背景。首先，让我们直观地看一下transformer的注意力头（Attention Head），它取代了NLP神经网络中的RNN层。
+这一节简要介绍了NLP中促成Transformer模型发展的背景，我们将在“:ref:`chapter-2`”中更详细地描述这一背景。首先，让我们直观地看一下transformer的注意力头（Attention Head），它取代了NLP神经网络中的RNN层。
 
-Transformer的核心概念可以粗略地概括为“混合标记（Mixing Tokens）”。自然语言处理模型首先将单词序列转换为标记（Token）。循环神经网络（RNN）通过循环函数顺序地分析标记。而Transformer则不按顺序分析标记，而是将每个标记与序列中的其他标记相关联，如图:numref:`fig-1`所示。读者可以在[这里](https://github.com/jessevig/bertviz)尝试自定义的可视化。
+Transformer的核心概念可以粗略地概括为“混合标记（Mixing Tokens）”。自然语言处理模型首先将单词序列转换为标记（Token）。循环神经网络（RNN）通过循环函数顺序地分析标记。而Transformer则不按顺序分析标记，而是将每个标记与序列中的其他标记相关联，如图 :numref:`fig-1` 所示。读者可以在[这里](https://github.com/jessevig/bertviz)尝试自定义的可视化。
 
 ![Transformer中某一层的注意力头](screenshots/2024-03-19-10-06-17.png)
 :label:`fig-1`
 
-我们将在“:ref:`sec-2`”中详细介绍注意力头的细节。目前来说，从图:numref:`fig-1`可以得出的结论是，序列中的每个单词（标记）都与序列中的所有其他单词相关联。这个模型为工业4.0的自然语言处理打开了大门。
+我们将在“:ref:`chapter-2`”中详细介绍注意力头的细节。目前来说，从图 :numref:`fig-1` 可以得出的结论是，序列中的每个单词（标记）都与序列中的所有其他单词相关联。这个模型为工业4.0的自然语言处理打开了大门。
 
 接下来让我们简要回顾一下transformer的背景。
 
@@ -31,7 +31,7 @@ Transformer的核心概念可以粗略地概括为“混合标记（Mixing Token
 
 1982年，约翰·霍普菲尔德（John Hopfield）引入了一种循环神经网络（RNN），被称为霍普菲尔德网络（Hopfield Network）或“联想”神经网络（“Associative Neural Network”）。W.A.利特尔（W.A Little）在1974年写了《大脑中持久态的存在》（*The existence of persistent states*），约翰·霍普菲尔德受其启发，为学习过程奠定了几十年的理论基础。RNN得到了进一步发展，而我们今天所熟知的LSTM也随之出现。
 
-循环神经网络（RNN）能够高效地记忆序列的持久状态，如图:numref:`fig-2`所示：
+循环神经网络（RNN）能够高效地记忆序列的持久状态，如图 :numref:`fig-2` 所示：
 
 ![RNN流程图](screenshots/rnn-process.svg)
 :label:`fig-2`
@@ -52,4 +52,4 @@ Transformer的核心概念可以粗略地概括为“混合标记（Mixing Token
 
 似乎没有其他办法可以取得更多进展。就这样过了三十年。然后，从2017年末开始，面向工业化的最先进的transformer模型出现了。Transformer具有注意力头子层（Attention Head Sublayer）等功能。至此，循环神经网络（RNN）不再是序列建模的必要条件。
 
-在深入研究原始Transformer的架构之前（详见:ref:`sec-2`），让我们从高层次上开始，通过检视我们应该使用的软件资源的范式转变来学习和实现Transformer模型。
+在深入研究原始Transformer的架构之前（详见:ref:`chapter-2`），让我们从高层次上开始，通过检视我们应该使用的软件资源的范式转变来学习和实现Transformer模型。
