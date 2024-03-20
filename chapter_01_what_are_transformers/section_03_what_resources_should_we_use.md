@@ -35,6 +35,7 @@ AllenNLP提供了一些机器学习的[演示程序（Demo）](https://allenai.o
 ```
 
 ```{.python .input}
+# Hide outputs
 from allennlp.predictors import Predictor
 from gpr_pub import visualization
 from IPython.core.display import display, HTML
@@ -45,7 +46,9 @@ display(HTML(open('gpr_pub/visualization/highlight.js').read()))
 
 # 加载指代消解模型
 predictor = Predictor.from_path("https://storage.googleapis.com/allennlp-public-models/coref-spanbert-large-2021.03.10.tar.gz")
+```
 
+```{.python .input}
 # 示例输入文本
 text = "Barack Obama was born in Hawaii. He was the 44th President of the United States."
 
@@ -88,7 +91,7 @@ result.text
 
 Hugging Face采用了不同的方法，并为各种任务提供了广泛且数量众多的Transformer模型，这是一种有趣的理念。Hugging Face提供了灵活的模型选择。此外，Hugging Face还提供了高级API和开发者可控的API。在本书的多个章节中，我们将探索Hugging Face作为一种教育工具和特定任务的可能解决方案。
 
-我们看一下利用Hugging Face提供的软件库和不同的预训练Transformer模型实现自然语言生成任务的代码：
+我们看一下利用Hugging Face提供的软件库和预训练Transformer模型实现自然语言生成任务的代码：
 
 ```{.python }
 # 安装Hugging Face transformer库
@@ -96,24 +99,23 @@ Hugging Face采用了不同的方法，并为各种任务提供了广泛且数�
 ```
 
 ```{.python .input}
+# Hide outputs
 from transformers import pipeline, set_seed
 
 # 固定随机种子
 set_seed(42)
-# 选择gpt2模型
-gpt2 = pipeline("text-generation", model="gpt2")
 
-gpt2("Hello, I'm a language model.", max_length=10)
+# 初始化基于gpt2模型的生成器
+gpt2_generator = pipeline("text-generation", model="gpt2")
+
+text = "Hello, I'm a language model."
+
+# 在text后生成最多10个标记
+output = gpt2_generator(text, max_new_tokens=20)
 ```
 
 ```{.python .input}
-from transformers import pipeline, set_seed
-
-# 固定随机种子
-set_seed(42)
-# 选择Bart模型
-dialogpt = pipeline("text-generation", model="facebook/bart-base")
-dialogpt("Hello, I'm a language model.", max_length=10)
+output[0]["generated_text"]
 ```
 
 然而，OpenAI专注于全球最强大的少数几个Transformer引擎，并可以在许多NLP任务上达到人类水平。在“:ref:`chapter-7`”中，我们将展示OpenAI的GPT-3引擎的强大能力。
