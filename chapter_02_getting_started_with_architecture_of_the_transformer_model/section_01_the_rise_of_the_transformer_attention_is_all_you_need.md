@@ -1,4 +1,4 @@
-# Transformer的兴起: Attention is All You Need
+# Transformer模型架构
 
 在*Attention is All You Need*这篇论文中，原始的Transformer模型由6层的堆栈组成，其中第$l$层的输出是第$l+1$层的输入，直到最后一层。如图 :numref:`fig-1` 所示，左边是一个6层的编码器堆栈，右边是一个6层的解码器堆栈。
 
@@ -29,7 +29,7 @@ The cat sat on the mat.
 
 至此，我们已经浅显地从外部的视角了解了Transformer. 接下来我们来看一下Transformer编码器的内部结构。
 
-## 编码器堆栈
+## Transformer编码器
 
 原始Transformer模型的编码器和解码器的层都是一堆叠的层。编码器堆栈的每一层具有如图 :numref:`fig-3` 所示的结构。图中分别展示了第1层、中间层和第$N$层的情况，因为它们的两端连接着不同的其他模块。
 
@@ -54,7 +54,7 @@ $d_\text{model}$具有强大的影响。在Transformer中几乎所有关键的�
 
 上述Transformer编码器的整体视图展示了Transformer的高度优化架构。接下来我们将深入研究编码其中的每个子层及其机制。
 
-### 输入嵌入层（Input Embedding Layer）
+### 输入嵌入层
 
 在原始Transformer模型中，输入嵌入层（Input Embedding Layer）使用学习到的嵌入（Embeddings）将输入的tokens转换为维度为$d_\text{model}=512$的向量。
 
@@ -126,13 +126,13 @@ model = word2vec.Word2Vec([tokens], vector_size=512, window=2, min_count=1)
 
 在完成嵌入后，我们可以看到，“black”的嵌入向量如下：
 
-```{.python .input}
+```{.python }
 model.wv["black"]
 ```
 
 “brown”的嵌入向量如下：
 
-```{.python .input}
+```{.python }
 model.wv["brown"]
 ```
 
@@ -160,7 +160,7 @@ model.wv.similarity("black", "brown")
 
 这是因为上面使用的word2vec模型只在一个句子上进行了词嵌入向量的训练，训练数据太少。接下来，我们使用Text8语料库来对word2vec进行训练。
 
-```{.python .input}
+```{.python}
 # Hide outputs
 # 下载并解压text8语料库
 !wget http://mattmahoney.net/dc/text8.zip
@@ -222,6 +222,7 @@ $$
 ```{.python .input}
 # Hide outputs
 import math
+import numpy as np
 
 
 def positional_encoding(pos, d_model=512):
@@ -229,12 +230,350 @@ def positional_encoding(pos, d_model=512):
     for i in range(0, 512, 2):
         pe[i] = math.sin(pos / (10000 ** ((2 * i) / d_model)))
         pe[i+1] = math.cos(pos / (10000 ** ((2 * i) / d_model)))
-    return pe
+    return np.array(pe)
 ```
 
 可以由此计算得到任意位置的位置编码向量，它们都是长度为`d_model`的向量：
 
-```{.python .input}
+```{.python }
 for pos in range(5):
     print(positional_encoding(pos))
 ```
+
+接下来我们讨论如何将位置编码向量融合到词嵌入向量上。
+
+#### 融合位置编码
+
+Transformer使用一种最简单的方式将词嵌入向量与位置编码融合：直接将位置编码向量与词嵌入向量相加。我们将融合后得到的向量称为词向量（Word Vector）。
+
+这个解决方案很直接。然而，我们可能会丢失词嵌入的信息，因为它的影响会被位置编码向量“缩小”。在上面的代码中我们可以看到，词嵌入向量与位置编码向量相差了约两个数量级。
+
+我们直观地演示一下直接相加后会对单词的相似度所造成的影响。我们回到句子“The black cat sat on the couch and the brown dog slept on the rug.”，其中“black”在第1个位置（从0开始），“brown”在第9个位置。我们通过简单相加的方式求出两个单词的词向量：
+
+```{.python .input}
+# Hide outputs
+pwev_black = model.wv["black"] + positional_encoding(1)
+pwev_brown = model.wv["brown"] + positional_encoding(9)
+```
+
+然后求两个词向量的余弦相似度：
+
+```{.python .input}
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+cosine_similarity(pwev_black[None, ...], pwev_brown[None, ...])
+```
+
+可以发现，此时计算出来两个词向量的相似度约为`0.76`，已经远大于之前根据不带位置信息的词嵌入向量计算出来的约`0.48`. 可见，位置编码对词的语义影响太过强大。
+
+一种简单的方式是通过将词嵌入向量乘一个较大的数来增加其影响。这个数一般可以取$\sqrt{d_\text{model}}$.
+
+```{.python .input}
+# Hide outputs
+# 对词嵌入向量乘以sqrt(d_model)
+pwev_black_better = model.wv["black"] * math.sqrt(512) + positional_encoding(1)
+pwev_brown_better = model.wv["brown"] * math.sqrt(512) + positional_encoding(9)
+```
+
+```{.python .input}
+cosine_similarity(pwev_black_better[None, ...], pwev_brown_better[None, ...])
+```
+
+可以看到，此时位置编码的影响已经被削弱，两个词向量的相似度约为`0.48`，与不带位置信息的词嵌入向量的相似度相当。
+
+### 多头注意力子层
+
+多头注意力（Multi-head Attention）子层包含八个注意力头（Attention Head）和一个归一化层，归一化层对注意力头的输出进行归一化，并添加残差连接，如图 :numref:`fig-4` 所示。
+
+![多头注意力子层](screenshots/multi-head-attention-sublayer.svg)
+:label:`fig-4`
+
+本节从注意力层的架构开始，然后使用Python实现了多头注意力的示例代码，最后描述了归一化层中的归一化处理和残差连接。
+
+让我们从多头注意力的架构开始。
+
+#### 多头注意力的架构
+
+编码器中的第一层的多头注意力子层的输入是一组向量，其中包含了每个单词的词嵌入和位置编码。
+
+多头注意力机制会将每个单词都与其他所有单词进行映射，从而确定该单词在序列中的重要程度和含义。
+
+用一个符合人类直觉的例子来解释：对于句子“The cat sat on the rug and it was dry-cleaned.”，如果不看上下文，“it”可能指代“cat”，也可能指代“rug”，从而我们人脑的注意力机制会给“it”对“cat”和对“rug”分配相同的注意力权重。而当我们看到dry-cleaned时，我们会提高“it”对“rug”的注意力权重，降低“it”对“cat”的注意力权重。
+
+Transformer的注意力机制也是这样。在刚开始时，“it”对所有单词的注意力权重是相同的。随着在大量语料上进行训练，“it”对“rug”的注意力权重会高于对“cat”的注意力权重。
+
+输入序列中，每个单词$x_t$可以表示成一个长度为$d_\text{model}=512$的向量$\text{WE}(x_t)$，即词向量。
+
+同理，整个句子$\mathbf{x}=(x_1,\cdots,x_N)$可以表示为一个大小为$N \times d_\text{model} = N \times 512$的矩阵$\mathbf{X}=(\text{WE}(x_1),\cdots,\text{WE}(x_N))$，我们称为词序列矩阵。
+
+词序列矩阵$\mathbf{X}$会被输入到多头注意力（Multi-Head Attention）子层的每个注意力头（Attention Head）中，如图 :numref:`fig-5` 所示。
+
+![](screenshots/8-attention-heads.svg)
+:label:`fig-5`
+
+中间蓝色的部分分别表示$m=8$个注意力头，$\mathbf{Z}_1,\cdots,\mathbf{Z}_8$分别对应每个头的输出，输出均为$N \times d_k$的矩阵. 一般来说，$d_k=d_\text{model}/m$.
+
+最终，所有注意力头的输出拼接为最终输出$\mathbf{Z}$，为$N\times d_k\times m = N\times d_\text{model}$的矩阵。
+
+$\mathbf{Z}$再经过一次线性变换得到多头注意力子层的最终的输出$\mathbf{H}$（未经归一化和残差连接），$\mathbf{H}$的形状与$\mathbf{Z}$相同。
+
+注意力头内部采用的是比例缩放点积注意力（Scaled Dot-Product Attention）运算。以Head 1为例，其内部结构如图 :numref:`fig-6` 所示。
+
+![注意力头内部的点积注意力](screenshots/scaled-dot-product.svg)
+
+可以看到，输入矩阵$\mathbf{X}$被施加了三种线性变换，线性变换的权重分别为$\mathbf{W}^Q_1,\mathbf{W}^K_1,\mathbf{W}^V_1$，并分别得到新的矩阵$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$:
+
+- $\mathbf{W}^Q_1$是查询权重矩阵（Query Weight Matrix），其大小为$d_\text{model} \times d_q$. $\mathbf{Q}_1=\mathbf{X}\mathbf{W}^Q_1$称为查询矩阵（Query Matrix），其形状为$N \times d_q$.
+- $\mathbf{W}^K_1$是键权重矩阵（Key Weight Matrix），其大小为$d_\text{model} \times d_k$. $\mathbf{K}_1=\mathbf{X}\mathbf{W}^K_1$称为键矩阵（Key Matrix），其形状为$N \times d_k$.
+- $\mathbf{W}^V_1$是值权重矩阵（Value Weight Matrix），其大小为$d_\text{model} \times d_v$. $\mathbf{V}_1=\mathbf{X}\mathbf{W}^V_1$称为值矩阵（Value Matrix），其形状为$N \times d_v$.
+
+图 :numref:`fig-6` 中所示的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$三者之间的运算称为缩放点积注意力（Scaled Dot-Product Attention），其中:
+
+- MatMul表示矩阵乘法
+- Scale表示将输入缩小为原来的$\frac{1}{\sqrt{d_k}}$
+- Softmax表示对输入应用[softmax函数](https://zhuanlan.zhihu.com/p/105722023)
+
+比例缩放点积注意力使用公式表示为：
+
+$$
+\text{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V})=\text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
+$$
+
+Head 1的输出可以表示为
+
+$$
+\mathbf{Z}_1=\text{Attention}(\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1)
+$$
+
+其中线性变换的权重$\mathbf{W}^Q_1,\mathbf{W}^K_1,\mathbf{W}^V_1$是可训练的参数，为了得到可用的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$，我们需要训练模型来学习这些参数。
+
+所有头的输出拼接起来为
+
+$$
+\mathbf{Z}=\text{Concat}(\mathbf{Z}_1,\cdots,\mathbf{Z}_8)
+$$
+
+再经过一次线性变换得到子层最终的输出$\mathbf{H}$
+
+$$
+\mathbf{H}=\mathbf{Z}\mathbf{W}^O
+$$
+
+接下来，我们将使用最基本的Python代码，只使用numpy库和softmax函数，用8个步骤来实现多头注意力机制的关键部分。
+
+#### 第1步：构建输入
+
+首先安装numpy和scipy:
+
+```{.python .input}
+# Hide outputs
+!pip install numpy scipy
+```
+
+然后导入所需要的包
+
+```{.python .input}
+# Hide outputs
+import numpy as np
+from scipy.special import softmax
+```
+
+为了简单和直观起见，我们将$d_\text{model}$设为4而不是512.
+
+考虑一个长度为3的token序列，它的词序列矩阵大小应该为$3\times 4$，我们在代码里创建一个矩阵来模拟它：
+
+```{.python .input}
+X = np.array([
+    [1.0, 0.0, 1.0, 0.0],
+    [0.0, 2.0, 0.0, 2.0],
+    [1.0, 1.0, 1.0, 1.0]
+])
+print(X)
+```
+
+#### 第2步：初始化权重矩阵
+
+这里我们使用$m=2$个注意力头，从而$d_k=d_\text{model}/m=2$，并令$d_q=d_v=d_k$.
+
+首先初始化第1个注意力头的权重矩阵$\mathbf{W}^Q_1,\mathbf{W}^K_2,\mathbf{W}^V_3$，大小均为$d_\text{model} \times d_k = 4 \times 2$.
+
+```{.python .input}
+W_Q_1 = np.array([
+    [1, 0],
+    [0, 1],
+    [0, 0],
+    [1, 1]
+])
+W_K_1 = np.array([
+    [0, 1],
+    [1, 0],
+    [0, 0],
+    [1, 0]
+])
+W_V_1 = np.array([
+    [0, 2],
+    [0, 3],
+    [1, 0],
+    [1, 1]
+])
+```
+
+然后同样地初始化第2个注意力头的权重矩阵，大小与上面相同：
+
+```{.python .input}
+W_Q_2 = np.array([
+    [1, 1],
+    [0, 0],
+    [1, 0],
+    [0, 1]
+])
+W_K_2 = np.array([
+    [1, 0],
+    [0, 0],
+    [0, 1],
+    [1, 0]
+])
+W_V_2 = np.array([
+    [3, 0],
+    [0, 1],
+    [2, 0],
+    [1, 1]
+])
+```
+
+#### 第3步：计算Q, K, V矩阵
+
+计算第1个注意力头中的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$
+
+```{.python .input}
+Q_1 = np.matmul(X, W_Q_1)
+K_1 = np.matmul(X, W_K_1)
+V_1 = np.matmul(X, W_V_1)
+```
+
+计算第2个注意力头中的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$
+
+```{.python .input}
+Q_2 = np.matmul(X, W_Q_2)
+K_2 = np.matmul(X, W_K_2)
+V_2 = np.matmul(X, W_V_2)
+```
+
+查看一下计算得到的矩阵:
+
+```{.python .input}
+Q_1, K_1, V_1
+```
+
+```{.python .input}
+Q_2, K_2, V_2
+```
+
+Q, K, V的大小均为$N \times d_k$，即$3 \times 2$
+
+#### 第4步：计算注意力权重
+
+
+第1个注意力头的最终输出为：
+
+$$
+\mathbf{Z}_1=\text{Attention}(\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1)=\text{softmax}\left(\frac{\mathbf{Q}_1\mathbf{K}_1^T}{\sqrt{d_k}}\right)\mathbf{V}_1
+$$
+
+我们先来算这一部分：$\left(\frac{\mathbf{Q}_1\mathbf{K}_1^T}{\sqrt{d_k}}\right)$，也被称为注意力权重矩阵:
+
+代码如下
+
+```{.python .input}
+d_k = 2
+attention_weights_1 = (Q_1 @ K_1.T) / np.sqrt(d_k)
+print(attention_weights_1)
+```
+
+可以看到，注意力权重矩阵是一个大小为$N \times N = 3 \times 3$的矩阵. 
+
+- 矩阵第$i$行第$j$列的元素表示输入的句子中第$i$个单词对第$j$个单词的注意力权重。例如，第1个单词对第3个单词的注意力权重为1.41421356
+- 从行的视角看，矩阵第$i$行表示第$i$个单词对其他所有单词的注意力权重
+- 从列的视角看，矩阵第$j$列表示其他所有单词对第$j$个单词的注意力权重
+
+上面的注意力权重矩阵只是第1个注意力头的想法，我们用同样的方法计算第2个注意力头的注意力权重矩阵：
+
+```{.python .input}
+attention_weights_2 = (Q_2 @ K_2.T) / np.sqrt(d_k)
+print(attention_weights_2)
+```
+
+#### 第5步：Softmax操作
+
+对注意力权重矩阵中每一行做softmax运算：
+
+```{.python .input}
+attention_weights_1[0] = softmax(attention_weights_1[0])
+attention_weights_1[1] = softmax(attention_weights_1[1])
+attention_weights_1[2] = softmax(attention_weights_1[2])
+print(attention_weights_1)
+```
+
+可以看到，softmax函数的直观作用是将每一行的权重之和都变为了1.
+
+对于`attention_weights_2`我们使用更简单的softmax调用方法：
+
+```{.python .input}
+attention_weights_2 = softmax(attention_weights_2)
+print(attention_weights_2)
+```
+
+#### 第6步：计算注意力头输出
+
+第1个注意力头的输出为softmax后的注意力权重矩阵右乘值矩阵$\mathbf{V}_1$：
+
+$$
+\mathbf{Z}_1=\text{Attention}(\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1)=\text{softmax}\left(\frac{\mathbf{Q}_1\mathbf{K}_1^T}{\sqrt{d_k}}\right)\mathbf{V}_1
+$$
+
+第1个注意力头的输出计算代码如下：
+
+```{.python .input}
+attention_outputs_1 = attention_weights_1 @ V_1
+attention_outputs_1
+```
+
+可以看到，注意力头的输出是一个大小为$N \times d_v = 3 \times 2$的矩阵，其中第$i$行是一个向量，表示第$i$个单词在$d_v$个不同维度的特征值。
+
+第2个注意力头的输出计算代码如下：
+
+```{.python .input}
+attention_outputs_2 = attention_weights_2 @ V_2
+attention_outputs_2
+```
+
+#### 第7步：拼接所有头的输出
+
+我们使用了2个注意力头，现在将它们的输出拼接起来得到$\mathbf{Z}=\text{Concat}(\mathbf{Z}_1,\mathbf{Z}_2)$:
+
+```{.python .input}
+attention_outputs = np.concatenate([attention_outputs_1, attention_outputs_2], axis=1)
+attention_outputs
+```
+
+可以看到，`attention_outputs`即$\mathbf{Z}$是大小为$N\times d_\text{model}=3 \times 4$的矩阵
+
+#### 第8步：得到最终输出
+
+常见的Transformer代码实现中，还需要对`attention_outputs`进行一次形状不变的线性变换:
+
+```{.python .input}
+W_O = np.array([
+    [1, 0, 0, 1],
+    [0, 0, 1, 1],
+    [0, 1, 0, 1],
+    [1, 1, 1, 1]
+])
+hidden_states = attention_outputs @ W_O
+hidden_states
+```
+
+得到的`hidden_states`为$N\times d_\text{model}=3 \times 4$的矩阵。
+
+`hidden_states`中的每个向量也可以看作句子中每个单词的表征。但与$X$不同的是，$X$中的每个向量只包含一个单词的信息，而`hidden_states`中的向量是通过对单词之间互相关联的注意力运算得到的，因此还能包含上下文的信息。
