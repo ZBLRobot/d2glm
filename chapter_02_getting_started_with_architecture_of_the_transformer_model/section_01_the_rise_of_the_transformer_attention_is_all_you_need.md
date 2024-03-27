@@ -577,3 +577,63 @@ hidden_states
 得到的`hidden_states`为$N\times d_\text{model}=3 \times 4$的矩阵。
 
 `hidden_states`中的每个向量也可以看作句子中每个单词的表征。但与$X$不同的是，$X$中的每个向量只包含一个单词的信息，而`hidden_states`中的向量是通过对单词之间互相关联的注意力运算得到的，因此还能包含上下文的信息。
+
+#### 归一化和残差连接
+
+每一个子层（包括多头注意力子层和前馈子层）之后都有一个层后归一化模块（Post-Layer Normalization Post-LN），如图 :numref:`fig-7` 中“Add & Norm”所示。
+
+![层归一化](screenshots/multi-head-attention-sublayer.svg)
+:label:`fig-7`
+
+Post-LN包含一个残差连接（Residual Connection）和一个层归一化（Layer Normalization）过程。残差连接简单来说就是把子层的输入加到子层的输出上。残差连接的目标是确保关键信息不会丢失。整个Post-LN过程可以表述为以下公式：
+
+$$
+\text{LayerNormalization}(\mathbf{X}+\text{Sublayer}(\mathbf{X}))
+$$
+
+其中$\mathbf{X}$是子层的输入，$\text{Sublayer}(\mathbf{X})$是子层的输出。
+
+层归一化的输入和输出均为长度为$d_\text{model}=512$的向量。层归一化有多种实现方式，且不同模型的层归一化方式也存在不同。一种基本的实现方式如下：
+
+$$
+\text{LayerNormalization}(\boldsymbol{v})=\gamma\frac{\boldsymbol{v}-\mu}{\sigma}+\boldsymbol{\beta}
+$$
+
+其中：
+
+- $\mu$是输入向量$\boldsymbol{v}$的均值：
+  $$
+  \mu=\frac{1}{d}\sum_{k=1}^dv_k
+  $$
+
+- $\sigma$是$\boldsymbol{v}$的标准差：
+  $$
+  \sigma^2=\frac{1}{d}\sum_{k=1}^d(v_k-\mu)^2
+  $$
+
+- $\gamma$是比例缩放参数
+- $\boldsymbol{\beta}$是偏置向量
+
+### 前馈网络子层
+
+前馈网络（Feedforward Network, FFN）子层的输入是上一子层（多头注意力子层）的post-LN模块的输出，如图 :numref:`fig-8` 所示：
+
+![前馈子层](screenshots/feedforward-sublayer.svg)
+:label:`fig-8`
+
+FFN子层具有以下特性：
+
+- 编码器和解码器中的FFN均为[全连接网络（Fully-Connected Network, FCN）](https://ver217.github.io/2018/07/06/fc/)
+- FFN采用逐位置的计算过程，采用相同的方式单独对每个位置进行计算
+- FFN包含两个全连接层，并且使用ReLU激活函数
+- FFN整体的输入和输出都是长度为$d_\text{model}=512$的向量，隐藏层（中间层）的输入输出维度为$d_\text{ff}=2048$，如图 :numref:`fig-9` 所示
+- FFN可以被视为两个卷积核为1的[卷积层](https://paulxiong.medium.com/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%9D%E5%AD%A6%E8%80%85%E6%8C%87%E5%8D%97-31e177fdded2)
+
+![FFN内部结构](screenshots/FFN-inner.svg)
+:label:`fig-9`
+
+FFN的输出跟多头注意力的输出一样需要经过post-LN层，得到整个FFN子层的输出。FFN子层的输出会被作为编码器中下一个多头注意力子层的输入。编码器中最后一层FFN子层的输出则会被作为解码器中多头注意力子层的输入。
+
+接下来我们来看解码器的结构。
+
+## Transformer解码器
