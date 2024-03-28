@@ -637,3 +637,167 @@ FFN的输出跟多头注意力的输出一样需要经过post-LN层，得到整�
 接下来我们来看解码器的结构。
 
 ## Transformer解码器
+
+Transformer模型的解码器与编码器类似，都是通过多层堆叠起来的。每一个解码器层的结构如图 :numref:`fig-10` 所示。
+
+![Transformer解码器的每一层](screenshots/transformer-decoder-layer.svg)
+:label:`fig-10`
+
+每一个解码器层由三个子层组成：掩蔽多头注意力子层（Masked Multi-head Attention Layer）、多头注意力子层以及前馈网络子层。
+
+掩蔽多头注意力子层与普通的多头注意力子层在计算注意力权重时有所不同。
+
+- 后者在计算注意力权重时，对于每个位置的单词，都会计算其与其他所有位置的注意力权重。
+- 前者在计算注意力权重时，对于每个位置的单词，会掩蔽其后续位置上单词的注意力权重。
+
+因此，在掩蔽多头注意力子层中，每个位置的单词只能“看到”其前面的单词，而不能“看到”其后面的单词。
+
+这一机制可以让Transformer学会只根据前面的句子来预测下一个单词。
+
+与编码器相同，解码器中每个子层后都有“Add & Norm”模块来进行残差连接和层归一化。
+
+与编码器相同，输出嵌入层（Output Embedding）和位置编码（Positional Encoding）的输出也只与第一层解码器相连。
+
+解码器中各子层之间的结构以及子层的作用与编码器相似。因此，本节只重点关注二者之间不同的部分。
+
+### 输出嵌入和位置编码
+
+输出嵌入层和位置编码函数与编码器中的输入嵌入层和位置编码相同。
+
+以英译中的机器翻译任务为例，输入是指原始的英文句子，输出就是我们所需要学习的中文翻译：
+
+```python
+Inputs = "The black cat set on the couch and the brown dog slept on the rug."
+Outputs = "黑猫坐在沙发上，棕狗睡在地毯上。"
+```
+
+在训练阶段，正如编码器中的输入句子一样，输出句子也会经过词嵌入层和位置编码函数。
+
+接下来我们来看解码器中的多头注意力层。
+
+### 掩蔽多头注意力层
+
+掩蔽多头注意力层是解码器每一层中位于下方的多头注意力子层：
+
+![掩蔽多头注意力子层在解码器层中的位置](screenshots/decoder-layer-first-attention-sublayer.svg)
+
+Transformer是一个[自回归模型](https://aws.amazon.com/cn/what-is/autoregressive-models/)。在自回归模型中，每一个token的预测都基于先前已有的token序列。将输出序列$\mathbf{y}$中第$t$个token记作$y_t$。在自回归模型中，要预测$y_t$，则$y_1,\cdots,y_{t-1}$必须是已知的。自回归模型会计算给定$y_1,\cdots,y_{t-1}$的条件下$y_t$的概率，即$p(y_t|y_1,\cdots,y_{t-1})$.
+
+掩蔽多头注意力层通过对注意力权重矩阵进行掩码操作来实现自回归机制。图 :numref:`fig-11` 展示了掩蔽多头注意力与普通多头注意力中注意力头内部的点积注意力的区别。
+
+![掩蔽多头注意力与普通多头注意力中注意力头内部的点积注意力](screenshots/normal-attention-vs-masked-attention.svg)
+:label:`fig-11`
+
+可以看到，掩蔽多头注意力机制在比例缩放操作（Scale）之后进行了掩蔽（Mask）操作。
+
+掩蔽注意力机制中比例缩放点积注意力使用公式表示为：
+
+$$
+\text{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V})=\text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}+\mathbf{M}\right)\mathbf{V}
+$$
+
+其中$\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}$是注意力权重矩阵，大小为$N\times N$，矩阵第$i$行第$j$列的元素表示输入的句子中第$i$个单词对第$j$个单词的注意力权重。
+
+为了实现自回归机制，我们只允许每个单词关注其前面的单词，而不允许其关注后面的单词。
+
+因此，我们使用掩蔽矩阵$\mathbf{M}$将注意力权重矩阵中列号大于行号的元素掩蔽掉。即，掩蔽矩阵$\mathbf{M}$中第$i$行第$j$列的元素$M_{ij}$满足：
+
+$$
+M_{ij}=\left\{
+    \begin{aligned}
+    0, & ~i\leq j \\
+    -\infty, & ~i>j &
+    \end{aligned}
+\right.
+$$
+
+接下来我们使用代码来演示掩蔽多头注意力的具体计算过程。
+
+我们沿用编码器中计算得到的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$和$\mathbf{Q}_2,\mathbf{K}_2,\mathbf{V}_2$矩阵，首先计算两个掩蔽注意力头的注意力权重矩阵：
+
+```{.python .input}
+d_k = 2
+attention_weights_1 = (Q_1 @ K_1.T) / np.sqrt(d_k)
+print(attention_weights_1)
+```
+
+```{.python .input}
+attention_weights_2 = (Q_2 @ K_2.T) / np.sqrt(d_k)
+print(attention_weights_2)
+```
+
+然后我们定义与注意力权重大小相同的掩蔽矩阵，这里我们将负无穷大实现为-10000.0：
+
+```{.python .input}
+inf = -10000.0
+M = np.array([
+    [0, -inf, -inf],
+    [0,    0, -inf],
+    [0,    0,    0],
+])
+```
+
+将掩蔽矩阵与权重矩阵相加：
+
+```{.python .input}
+# 对于`array`对象而言，`+=`是就地（inplace）操作，`+`会创建新对象
+attention_weights_1 = attention_weights_1 + M
+attention_weights_2 = attention_weights_2 + M
+```
+
+然后进行softmax操作：
+
+```{.python .input}
+attention_weights_1 = softmax(attention_weights_1)
+attention_weights_2 = softmax(attention_weights_2)
+```
+
+可以看到，每个单词对其后续单词的权重都变为接近0：
+
+```{.python .input}
+attention_weights_1
+```
+
+```{.python .input}
+attention_weights_2
+```
+
+### 交叉注意力层
+
+在解码器中，掩蔽多头注意力层之后还有一个不带掩蔽的普通多头注意力层，也称为交叉注意力（Cross-attention）层：
+
+![交叉注意力层子层在解码器层中的位置](screenshots/decoder-layer-second-attention-sublayer.svg)
+
+在注意力计算的过程中，按照输入来源可以分为：自注意力（Self-attention）和交叉注意力（Cross-attention）。自注意力中，$\mathbf{Q}, \mathbf{K}, \mathbf{V}$都来源于同一个序列。例如，
+
+- 编码器层中的多头注意力就是自注意力，因为其$\mathbf{Q}, \mathbf{K}, \mathbf{V}$均来源于输入序列$\mathbf{X}$.
+- 解码器层中的掩蔽多头注意力也是自注意力，因为其$\mathbf{Q}, \mathbf{K}, \mathbf{V}$均来源于输出序列$\mathbf{Y}$.
+
+而解码器中位于中间的多头注意力层则是交叉注意力，因为其$\mathbf{Q}$来源于输出序列$\mathbf{Y}$，而其$\mathbf{K}$和$\mathbf{V}$来源于输入序列$\mathbf{X}$.
+
+图 :numref:`fig-13` 展示了编码器中的自注意力、解码器中的自注意力以及解码器中的交叉注意力之间的区别。
+
+![编码器中的自注意力、解码器中的自注意力以及解码器中的交叉注意力](screenshots/self-attention-vs-cross-attention.svg)
+:label:`fig-13`
+
+其中交叉注意力中$\mathbf{K}_1$和$\mathbf{V}_1$的计算都来源于编码器的最终输出$\mathbf{H}(\mathbf{X})$，归根结底来源于输入序列$\mathbf{X}$.
+
+交叉注意力的目的是计算输出序列中每个单词对输入序列中每个单词的注意力。
+
+假设输入序列$\mathbf{X}$的长度为$N$，输出序列$\mathbf{Y}$的长度为$M$，则交叉注意力中的注意力权重矩阵的大小应为$M \times N$，且其中第$i$行$j$列的值表示$y_i$对$x_j$的注意力权重。
+
+其计算代码与自注意力类似，只是Q, K, V的来源不同，在此不赘述。
+
+### 解码器中其他模块
+
+与编码器相同：
+
+- 解码器每一层中也有前馈网络子层（FNN）
+- 每个注意力子层和FNN子层之后都有Post-LN模块进行残差连接和层归一化
+
+与编码器不同的是，解码器的最终输出还会经过一个线性层和一个Softmax层来输出最终预测单词的概率。
+
+- 线性层的作用是将解码器输出的$d_\text{model}=512$的特征向量转换为$d_\text{vocab}=$词表长度的向量
+- Softmax的作用是将转换后的向量进一步转换为每个单词的概率
+
+至此，我们已经基本介绍完了Transformer的架构，接下来我们来看Transformer是如何训练并取得良好表现的。
