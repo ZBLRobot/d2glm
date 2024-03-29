@@ -44,7 +44,7 @@ from IPython.core.display import display, HTML
 display(HTML(open('gpr_pub/visualization/highlight.css').read()))
 display(HTML(open('gpr_pub/visualization/highlight.js').read()))
 
-# 加载指代消解模型
+# 加载共指消解模型
 predictor = Predictor.from_path("https://storage.googleapis.com/allennlp-public-models/coref-spanbert-large-2021.03.10.tar.gz")
 ```
 
@@ -52,10 +52,10 @@ predictor = Predictor.from_path("https://storage.googleapis.com/allennlp-public-
 # 示例输入文本
 text = "Barack Obama was born in Hawaii. He was the 44th President of the United States."
 
-# 进行指代消解预测
+# 进行共指消解预测
 output = predictor.predict(document=text)
 
-# 可视化指代消解的结果
+# 可视化共指消解的结果
 visualization.render(output, allen=True, jupyter=True)
 ```
 
