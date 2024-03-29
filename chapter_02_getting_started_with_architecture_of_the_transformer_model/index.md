@@ -33,4 +33,5 @@ Transformer模型中的注意力机制的理念是摒弃循环神经网络的特
 section_01_the_rise_of_the_transformer_attention_is_all_you_need
 section_02_training_and_performance
 section_03_transformer_models_in_hugging_face
+section_04_exercise
 ```
