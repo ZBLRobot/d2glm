@@ -762,7 +762,7 @@ attention_weights_1
 attention_weights_2
 ```
 
-<!-- ### 交叉注意力层
+### 交叉注意力层
 
 在解码器中，掩蔽多头注意力层之后还有一个不带掩蔽的普通多头注意力层，也称为交叉注意力（Cross-attention）层：
 
@@ -800,4 +800,4 @@ attention_weights_2
 - 线性层的作用是将解码器输出的$d_\text{model}=512$的特征向量转换为$d_\text{vocab}=$词表长度的向量
 - Softmax的作用是将转换后的向量进一步转换为每个单词的概率
 
-至此，我们已经基本介绍完了Transformer的架构，接下来我们来看Transformer是如何训练并取得良好表现的。 -->
+至此，我们已经基本介绍完了Transformer的架构，接下来我们来看Transformer是如何训练并取得良好表现的。
