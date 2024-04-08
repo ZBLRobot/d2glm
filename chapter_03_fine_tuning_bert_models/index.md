@@ -1,4 +1,5 @@
 # 微调BERT模型
+:label:`chapter-3`
 
 在基础Transformer提出之后，基于Transformer架构的多种变体模型接踵而至。
 
@@ -28,5 +29,6 @@
 :numbered:
 
 section_01_the_architecture_of_bert
+
 section_02_fine_tuning_bert
 ```
