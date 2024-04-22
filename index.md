@@ -9,4 +9,5 @@
 chapter_01_what_are_transformers/index
 chapter_02_getting_started_with_architecture_of_the_transformer_model/index
 chapter_03_fine_tuning_bert_models/index
+chapter_04_pretraining_a_roberta_model_from_scratch/index
 ````
