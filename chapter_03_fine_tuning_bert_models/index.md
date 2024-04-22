@@ -31,4 +31,6 @@
 section_01_the_architecture_of_bert
 
 section_02_fine_tuning_bert
+
+section_03_exercise
 ```
