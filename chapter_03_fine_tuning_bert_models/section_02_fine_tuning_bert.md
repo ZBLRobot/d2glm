@@ -1,13 +1,16 @@
 # 微调BERT
+:label:`chapter-03-section-02`
 
 本节将对一个BERT模型进行微调，以预测下游任务的可接受性判断，并使用马修斯相关系数（Matthews Correlation Coefficient，MCC，后续解释）来衡量预测结果。本节的官方源码[见此处](https://github.com/Denis2054/Transformers-for-NLP-2nd-Edition/blob/main/Chapter03/BERT_Fine_Tuning_Sentence_Classification_GPU.ipynb)。
 
 ## 硬件限制
 
-Transformer模型需要GPU. 这里强烈建议使用免费的云GPU平台，因为在本地自己配置GPU计算环境较为复杂。
+Transformer模型需要GPU. 这里建议使用免费的云GPU平台:
 
 - [Google Colab](https://colab.research.google.com/)
 - [Kaggle Notebook](https://www.kaggle.com/code)
+
+如果使用自己的电脑或自己搭建的服务器上的GPU，请先安装CUDA和cuDNN（Google/问GPT）
 
 ## 安装PyTorch和Hugging Face Transformer
 
