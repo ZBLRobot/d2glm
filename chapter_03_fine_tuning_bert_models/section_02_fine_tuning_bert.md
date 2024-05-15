@@ -527,6 +527,7 @@ for batch in prediction_dataloader:
 ```
 
 ## 使用马修斯相关系数（MCC）进行评估
+:label:`chapter-2-section-2-mcc`
 
 马修斯相关系数（MCC）的公式如下：
 
