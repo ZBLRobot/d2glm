@@ -1,9 +1,9 @@
 # Transformer模型架构
 
-在*Attention is All You Need*这篇论文中，原始的Transformer模型由6层的堆栈组成，其中第$l$层的输出是第$l+1$层的输入，直到最后一层。如图 :numref:`fig-1` 所示，左边是一个6层的编码器堆栈，右边是一个6层的解码器堆栈。
+在*Attention is All You Need*这篇论文中，原始的Transformer模型由6层的堆栈组成，其中第$l$层的输出是第$l+1$层的输入，直到最后一层。如图 :numref:`ch2-sec1-fig-1` 所示，左边是一个6层的编码器堆栈，右边是一个6层的解码器堆栈。
 
 ![Transformer原始模型的架构](screenshots/transformers.svg)
-:label:`fig-1`
+:label:`ch2-sec1-fig-1`
 
 图中左边，输入数据在Transformer的编码器部分经过了一个注意力子层（Multi-Head Attention）和一个前馈子层（Feedforward）。图中右边，目标输出数据在Transformer的解码器部分经过了两个注意力子层（Masked Multi-Head Attention, Multi-Head Attention）和一个前馈网络子层（Feedforward）。我们注意到，Transformer架构中没有使用RNN、LSTM和CNN. 递归机制不复存在。
 
@@ -13,10 +13,10 @@
 The cat sat on the mat.
 ```
 
-注意力机制会在两个词向量之间执行点积运算，并且确定一个单词与其他所有单词的关系中最强的关系，包含与自身的关系（“cat”到“cat”）。图 :numref:`fig-2` 可视化了注意力机制作用在一个句子上的过程。
+注意力机制会在两个词向量之间执行点积运算，并且确定一个单词与其他所有单词的关系中最强的关系，包含与自身的关系（“cat”到“cat”）。图 :numref:`ch2-sec1-fig-2` 可视化了注意力机制作用在一个句子上的过程。
 
 ![单词“cat”对其他所有单词的注意力](screenshots/2024-03-20-11-11-25.png)
-:label:`fig-2`
+:label:`ch2-sec1-fig-2`
 
 注意力机制将提供单词之间更深入的关系，并产生更好的结果。
 
@@ -31,10 +31,10 @@ The cat sat on the mat.
 
 ## Transformer编码器
 
-原始Transformer模型的编码器和解码器的层都是一堆叠的层。编码器堆栈的每一层具有如图 :numref:`fig-3` 所示的结构。图中分别展示了第1层、中间层和第$N$层的情况，因为它们的两端连接着不同的其他模块。
+原始Transformer模型的编码器和解码器的层都是一堆叠的层。编码器堆栈的每一层具有如图 :numref:`ch2-sec1-fig-3` 所示的结构。图中分别展示了第1层、中间层和第$N$层的情况，因为它们的两端连接着不同的其他模块。
 
 ![Transformer编码器的每一层](screenshots/transformer-encoder-layer.svg)
-:label:`fig-3`
+:label:`ch2-sec1-fig-3`
 
 原始Transformer模型中，所有编码器层的结构是相同的。每一层包含两个主要的子层：多头注意力机制（Multi-Head Attention）和全连接的逐位置前馈网络（Fully Connected Position-wise Feedforward Network）。
 
@@ -284,10 +284,10 @@ cosine_similarity(pwev_black_better[None, ...], pwev_brown_better[None, ...])
 
 ### 多头注意力子层
 
-多头注意力（Multi-head Attention）子层包含八个注意力头（Attention Head）和一个归一化层，归一化层对注意力头的输出进行归一化，并添加残差连接，如图 :numref:`fig-4` 所示。
+多头注意力（Multi-head Attention）子层包含八个注意力头（Attention Head）和一个归一化层，归一化层对注意力头的输出进行归一化，并添加残差连接，如图 :numref:`ch2-sec1-fig-4` 所示。
 
 ![多头注意力子层](screenshots/multi-head-attention-sublayer.svg)
-:label:`fig-4`
+:label:`ch2-sec1-fig-4`
 
 本节从注意力层的架构开始，然后使用Python实现了多头注意力的示例代码，最后描述了归一化层中的归一化处理和残差连接。
 
@@ -307,10 +307,10 @@ Transformer的注意力机制也是这样。在刚开始时，“it”对所有�
 
 同理，整个句子$\mathbf{x}=(x_1,\cdots,x_N)$可以表示为一个大小为$N \times d_\text{model} = N \times 512$的矩阵$\mathbf{X}=(\text{WE}(x_1),\cdots,\text{WE}(x_N))$，我们称为词序列矩阵。
 
-词序列矩阵$\mathbf{X}$会被输入到多头注意力（Multi-Head Attention）子层的每个注意力头（Attention Head）中，如图 :numref:`fig-5` 所示。
+词序列矩阵$\mathbf{X}$会被输入到多头注意力（Multi-Head Attention）子层的每个注意力头（Attention Head）中，如图 :numref:`ch2-sec1-fig-5` 所示。
 
 ![](screenshots/8-attention-heads.svg)
-:label:`fig-5`
+:label:`ch2-sec1-fig-5`
 
 中间蓝色的部分分别表示$m=8$个注意力头，$\mathbf{Z}_1,\cdots,\mathbf{Z}_8$分别对应每个头的输出，输出均为$N \times d_k$的矩阵. 一般来说，$d_k=d_\text{model}/m$.
 
@@ -318,9 +318,10 @@ Transformer的注意力机制也是这样。在刚开始时，“it”对所有�
 
 $\mathbf{Z}$再经过一次线性变换得到多头注意力子层的最终的输出$\mathbf{H}$（未经归一化和残差连接），$\mathbf{H}$的形状与$\mathbf{Z}$相同。
 
-注意力头内部采用的是比例缩放点积注意力（Scaled Dot-Product Attention）运算。以Head 1为例，其内部结构如图 :numref:`fig-6` 所示。
+注意力头内部采用的是比例缩放点积注意力（Scaled Dot-Product Attention）运算。以Head 1为例，其内部结构如图 :numref:`ch2-sec1-fig-6` 所示。
 
 ![注意力头内部的点积注意力](screenshots/scaled-dot-product.svg)
+:label:`ch2-sec1-fig-6`
 
 可以看到，输入矩阵$\mathbf{X}$被施加了三种线性变换，线性变换的权重分别为$\mathbf{W}^Q_1,\mathbf{W}^K_1,\mathbf{W}^V_1$，并分别得到新的矩阵$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$:
 
@@ -328,7 +329,7 @@ $\mathbf{Z}$再经过一次线性变换得到多头注意力子层的最终的�
 - $\mathbf{W}^K_1$是键权重矩阵（Key Weight Matrix），其大小为$d_\text{model} \times d_k$. $\mathbf{K}_1=\mathbf{X}\mathbf{W}^K_1$称为键矩阵（Key Matrix），其形状为$N \times d_k$.
 - $\mathbf{W}^V_1$是值权重矩阵（Value Weight Matrix），其大小为$d_\text{model} \times d_v$. $\mathbf{V}_1=\mathbf{X}\mathbf{W}^V_1$称为值矩阵（Value Matrix），其形状为$N \times d_v$.
 
-图 :numref:`fig-6` 中所示的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$三者之间的运算称为缩放点积注意力（Scaled Dot-Product Attention），其中:
+图 :numref:`ch2-sec1-fig-6` 中所示的$\mathbf{Q}_1,\mathbf{K}_1,\mathbf{V}_1$三者之间的运算称为缩放点积注意力（Scaled Dot-Product Attention），其中:
 
 - MatMul表示矩阵乘法
 - Scale表示将输入缩小为原来的$\frac{1}{\sqrt{d_k}}$
@@ -580,10 +581,10 @@ hidden_states
 
 #### 归一化和残差连接
 
-每一个子层（包括多头注意力子层和前馈子层）之后都有一个层后归一化模块（Post-Layer Normalization Post-LN），如图 :numref:`fig-7` 中“Add & Norm”所示。
+每一个子层（包括多头注意力子层和前馈子层）之后都有一个层后归一化模块（Post-Layer Normalization Post-LN），如图 :numref:`ch2-sec1-fig-7` 中“Add & Norm”所示。
 
 ![层归一化](screenshots/multi-head-attention-sublayer.svg)
-:label:`fig-7`
+:label:`ch2-sec1-fig-7`
 
 Post-LN包含一个残差连接（Residual Connection）和一个层归一化（Layer Normalization）过程。残差连接简单来说就是把子层的输入加到子层的输出上。残差连接的目标是确保关键信息不会丢失。整个Post-LN过程可以表述为以下公式：
 
@@ -616,21 +617,21 @@ $$
 
 ### 前馈网络子层
 
-前馈网络（Feedforward Network, FFN）子层的输入是上一子层（多头注意力子层）的post-LN模块的输出，如图 :numref:`fig-8` 所示：
+前馈网络（Feedforward Network, FFN）子层的输入是上一子层（多头注意力子层）的post-LN模块的输出，如图 :numref:`ch2-sec1-fig-8` 所示：
 
 ![前馈子层](screenshots/feedforward-sublayer.svg)
-:label:`fig-8`
+:label:`ch2-sec1-fig-8`
 
 FFN子层具有以下特性：
 
 - 编码器和解码器中的FFN均为[全连接网络（Fully-Connected Network, FCN）](https://ver217.github.io/2018/07/06/fc/)
 - FFN采用逐位置的计算过程，采用相同的方式单独对每个位置进行计算
 - FFN包含两个全连接层，并且使用ReLU激活函数
-- FFN整体的输入和输出都是长度为$d_\text{model}=512$的向量，隐藏层（中间层）的输入输出维度为$d_\text{ff}=2048$，如图 :numref:`fig-9` 所示
+- FFN整体的输入和输出都是长度为$d_\text{model}=512$的向量，隐藏层（中间层）的输入输出维度为$d_\text{ff}=2048$，如图 :numref:`ch2-sec1-fig-9` 所示
 - FFN可以被视为两个卷积核为1的[卷积层](https://paulxiong.medium.com/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%88%9D%E5%AD%A6%E8%80%85%E6%8C%87%E5%8D%97-31e177fdded2)
 
 ![FFN内部结构](screenshots/FFN-inner.svg)
-:label:`fig-9`
+:label:`ch2-sec1-fig-9`
 
 FFN的输出跟多头注意力的输出一样需要经过post-LN层，得到整个FFN子层的输出。FFN子层的输出会被作为编码器中下一个多头注意力子层的输入。编码器中最后一层FFN子层的输出则会被作为解码器中多头注意力子层的输入。
 
@@ -638,10 +639,10 @@ FFN的输出跟多头注意力的输出一样需要经过post-LN层，得到整�
 
 ## Transformer解码器
 
-Transformer模型的解码器与编码器类似，都是通过多层堆叠起来的。每一个解码器层的结构如图 :numref:`fig-10` 所示。
+Transformer模型的解码器与编码器类似，都是通过多层堆叠起来的。每一个解码器层的结构如图 :numref:`ch2-sec1-fig-10` 所示。
 
 ![Transformer解码器的每一层](screenshots/transformer-decoder-layer.svg)
-:label:`fig-10`
+:label:`ch2-sec1-fig-10`
 
 每一个解码器层由三个子层组成：掩蔽多头注意力子层（Masked Multi-head Attention Layer）、多头注意力子层以及前馈网络子层。
 
@@ -683,10 +684,10 @@ Outputs = "黑猫坐在沙发上，棕狗睡在地毯上。"
 
 Transformer是一个[自回归模型](https://aws.amazon.com/cn/what-is/autoregressive-models/)。在自回归模型中，每一个token的预测都基于先前已有的token序列。将输出序列$\mathbf{y}$中第$t$个token记作$y_t$。在自回归模型中，要预测$y_t$，则$y_1,\cdots,y_{t-1}$必须是已知的。自回归模型会计算给定$y_1,\cdots,y_{t-1}$的条件下$y_t$的概率，即$p(y_t|y_1,\cdots,y_{t-1})$.
 
-掩蔽多头注意力层通过对注意力权重矩阵进行掩码操作来实现自回归机制。图 :numref:`fig-11` 展示了掩蔽多头注意力与普通多头注意力中注意力头内部的点积注意力的区别。
+掩蔽多头注意力层通过对注意力权重矩阵进行掩码操作来实现自回归机制。图 :numref:`ch2-sec1-fig-11` 展示了掩蔽多头注意力与普通多头注意力中注意力头内部的点积注意力的区别。
 
 ![掩蔽多头注意力与普通多头注意力中注意力头内部的点积注意力](screenshots/normal-attention-vs-masked-attention.svg)
-:label:`fig-11`
+:label:`ch2-sec1-fig-11`
 
 可以看到，掩蔽多头注意力机制在比例缩放操作（Scale）之后进行了掩蔽（Mask）操作。
 
@@ -775,10 +776,10 @@ attention_weights_2
 
 而解码器中位于中间的多头注意力层则是交叉注意力，因为其$\mathbf{Q}$来源于输出序列$\mathbf{Y}$，而其$\mathbf{K}$和$\mathbf{V}$来源于输入序列$\mathbf{X}$.
 
-图 :numref:`fig-13` 展示了编码器中的自注意力、解码器中的自注意力以及解码器中的交叉注意力之间的区别。
+图 :numref:`ch2-sec1-fig-13` 展示了编码器中的自注意力、解码器中的自注意力以及解码器中的交叉注意力之间的区别。
 
 ![编码器中的自注意力、解码器中的自注意力以及解码器中的交叉注意力](screenshots/self-attention-vs-cross-attention.svg)
-:label:`fig-13`
+:label:`ch2-sec1-fig-13`
 
 其中交叉注意力中$\mathbf{K}_1$和$\mathbf{V}_1$的计算都来源于编码器的最终输出$\mathbf{H}(\mathbf{X})$，归根结底来源于输入序列$\mathbf{X}$.
 

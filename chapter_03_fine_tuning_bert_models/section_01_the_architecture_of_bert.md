@@ -15,10 +15,10 @@ BERT的编码器层比原始Transformer模型更大。BERT的论文中使用了�
 - $\text{BERT}_\text{BASE}$: 编码器层数$N=12$，编码器层维度$d_\text{model}=768$，也表示为$H=768$. 注意力头数量$m=12$，每个注意力头的输出$z_i$的维度仍然为$d_k=768/12=64$.
 - $\text{BERT}_\text{LARGE}$: 编码器层数$N=24$，编码器维度$d_\text{model}=1024$，注意力头数量$m=16$，每个注意力头的输出$z_i$的维度仍然为$d_k=1024/16=64$.
 
-图 :numref:`fig-1` 直观地反映了三种不同模型的大小。
+图 :numref:`ch3-sec1-fig-1` 直观地反映了三种不同模型的大小。
 
 ![三种基于Transformer的模型](screenshots/2024-04-08-10-57-30.png)
-:label:`fig-1`
+:label:`ch3-sec1-fig-1`
 
 模型的大小和维度在BERT风格的预训练中起着重要作用。BERT模型就像人类一样，在具有更大的脑容量（模型大小和维度）和更多知识（数据）时能够产生更好的结果。学习大量数据的大型Transformer模型将更好地进行下游自然语言处理任务的预训练。
 
@@ -100,10 +100,10 @@ BERT会将其分词并拼接为如下形式：
 - `[CLS]`是一个分类标记，添加在第一个序列的开头，用于预测第二个序列是否跟随在第一个序列之后。
 - `[SEP]`是一个分隔标记，用于标识一个序列的结束。
 
-为了区分句子A和句子B，在进行NSP时需要引入额外的编码信息，如图 :numref:`fig-2` 所示：
+为了区分句子A和句子B，在进行NSP时需要引入额外的编码信息，如图 :numref:`ch3-sec1-fig-2` 所示：
 
 ![BERT输入编码](screenshots/2024-04-08-13-07-46.png)
-:label:`fig-2`
+:label:`ch3-sec1-fig-2`
 
 其中Token Embeddings对每个token做嵌入，得到token嵌入向量；Positional Encoding对token的位置做嵌入，得到位置编码向量；这两个嵌入模块在原始Transformer架构中都有，只不过BERT中的Positional Encoding是可学习的。
 
@@ -126,9 +126,10 @@ BERT还有一些额外的关键特点：
 
 ### BERT模型的预训练和微调
 
-BERT是一个两步训练框架。其中第一步是预训练，第二步是微调，如图 :numref:`fig-3` 所示。
+BERT是一个两步训练框架。其中第一步是预训练，第二步是微调，如图 :numref:`ch3-sec1-fig-3` 所示。
 
 ![BERT两步训练框架](screenshots/2024-04-08-14-33-40.png)
+:label:`ch3-sec1-fig-3`
 
 训练一个Transformer模型可能需要几个小时，甚至几天的时间。设计模型架构、调整参数以及选择适当的数据集来训练Transformer模型都需要相当一段时间进行工程化处理。
 

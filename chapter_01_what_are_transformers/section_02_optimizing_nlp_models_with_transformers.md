@@ -4,12 +4,12 @@
 
 这一节简要介绍了NLP中促成Transformer模型发展的背景，我们将在“:ref:`chapter-2`”中更详细地描述这一背景。首先，让我们直观地看一下transformer的注意力头（Attention Head），它取代了NLP神经网络中的RNN层。
 
-Transformer的核心概念可以粗略地概括为“混合标记（Mixing Tokens）”。自然语言处理模型首先将单词序列转换为标记（Token）。循环神经网络（RNN）通过循环函数顺序地分析标记。而Transformer则不按顺序分析标记，而是将每个标记与序列中的其他标记相关联，如图 :numref:`fig-1` 所示。读者可以在[这里](https://github.com/jessevig/bertviz)尝试自定义的可视化。
+Transformer的核心概念可以粗略地概括为“混合标记（Mixing Tokens）”。自然语言处理模型首先将单词序列转换为标记（Token）。循环神经网络（RNN）通过循环函数顺序地分析标记。而Transformer则不按顺序分析标记，而是将每个标记与序列中的其他标记相关联，如图 :numref:`ch1-sec2-fig-1` 所示。读者可以在[这里](https://github.com/jessevig/bertviz)尝试自定义的可视化。
 
 ![Transformer中某一层的注意力头](screenshots/2024-03-19-10-06-17.png)
-:label:`fig-1`
+:label:`ch1-sec2-fig-1`
 
-我们将在“:ref:`chapter-2`”中详细介绍注意力头的细节。目前来说，从图 :numref:`fig-1` 可以得出的结论是，序列中的每个单词（标记）都与序列中的所有其他单词相关联。这个模型为工业4.0的自然语言处理打开了大门。
+我们将在“:ref:`chapter-2`”中详细介绍注意力头的细节。目前来说，从图 :numref:`ch1-sec2-fig-1` 可以得出的结论是，序列中的每个单词（标记）都与序列中的所有其他单词相关联。这个模型为工业4.0的自然语言处理打开了大门。
 
 接下来让我们简要回顾一下transformer的背景。
 
@@ -31,10 +31,10 @@ Transformer的核心概念可以粗略地概括为“混合标记（Mixing Token
 
 1982年，约翰·霍普菲尔德（John Hopfield）引入了一种循环神经网络（RNN），被称为霍普菲尔德网络（Hopfield Network）或“联想”神经网络（“Associative Neural Network”）。W.A.利特尔（W.A Little）在1974年写了《大脑中持久态的存在》（*The existence of persistent states*），约翰·霍普菲尔德受其启发，为学习过程奠定了几十年的理论基础。RNN得到了进一步发展，而我们今天所熟知的LSTM也随之出现。
 
-循环神经网络（RNN）能够高效地记忆序列的持久状态，如图 :numref:`fig-2` 所示：
+循环神经网络（RNN）能够高效地记忆序列的持久状态，如图 :numref:`ch1-sec2-fig-2` 所示：
 
 ![RNN流程图](screenshots/rnn-process.svg)
-:label:`fig-2`
+:label:`ch1-sec2-fig-2`
 
 每个状态$S_n$捕捉了$S_{n-1}$的信息。当到达网络的终点时，函数$F$将会执行一个动作，这个动作可以是转换、建模或任何其他基于序列的任务。
 
