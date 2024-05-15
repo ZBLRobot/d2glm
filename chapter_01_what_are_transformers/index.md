@@ -33,11 +33,8 @@ Transformer是一种工业化、同质化的后深度学习模型（Post-Deep Le
 
 ```toc
 :maxdepth: 2
-:numbered:
 
 section_01_the_ecosystem_of_transformers
-
 section_02_optimizing_nlp_models_with_transformers
-
 section_03_what_resources_should_we_use
 ```
