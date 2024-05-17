@@ -52,6 +52,7 @@ model = trax.models.Transformer(
 ## 使用预训练权重初始化模型
 
 ```{.python .input}
+# Hide outputs
 # 远程路径为gs://trax-ml/models/translation/ende_wmt32k.pkl.gz
 model.init_from_file('./ende_wmt32k.pkl.gz', weights_only=True)
 ```
