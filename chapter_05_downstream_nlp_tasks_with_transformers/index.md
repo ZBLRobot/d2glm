@@ -1,4 +1,5 @@
 # 使用Transformer进行下游NLP任务
+:label:`chapter-5`
 
 预训练和微调一个Transformer模型需要大量的时间和精力，但当我们看到一个拥有数百万参数的Transformer模型在各种NLU任务中发挥作用时，这些努力都是值得的。
 

@@ -1,6 +1,6 @@
 # 预处理WMT数据集
 
-Vaswani等人（2017年）在WMT 2014年英德翻译任务和英法翻译任务中展示了Transformer的成就。Transformer在这些任务中取得了最先进的BLEU分数。
+[Vaswani等人（2017年）](https://arxiv.org/pdf/1706.03762)在WMT 2014年英德翻译任务和英法翻译任务中展示了Transformer的成就。Transformer在这些任务中取得了最先进的BLEU分数。
 
 2014年的WMT包含了多个欧洲语言的数据集。其中一个数据集包含了来自欧洲议会语料库第7版的数据。我们将使用来自[《欧洲议会会议平行语料库》（the European Parliament Proceedings Parallel Corpus）（1996-2011年）的法英（French-English）数据集](https://www.statmt.org/europarl/v7/fr-en.tgz)。
 

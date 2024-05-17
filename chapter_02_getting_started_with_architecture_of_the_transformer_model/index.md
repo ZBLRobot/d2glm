@@ -5,7 +5,7 @@
 
 在“:ref:`chapter-1`”中解释了循环神经网络（RNN）的局限性以及云端AI Transformer在设计和开发中所占据的重要地位。工业4.0开发人员的角色是理解原始Transformer的架构以及随后出现的多个Transformer生态系统。
 
-在2017年12月，Google Brain和Google Research发表了具有开创性意义的Vaswani等人的论文*Attention is All You Need*。Transformer应运而生。Transformer在性能上超越了现有的最先进自然语言处理（NLP）模型。相比之前的架构，Transformer的训练速度更快，并获得了更高的评估结果。因此，Transformer已成为NLP的关键组成部分。
+在2017年12月，Google Brain和Google Research发表了具有开创性意义的Vaswani等人的论文[*Attention is All You Need*](https://arxiv.org/pdf/1706.03762)。Transformer应运而生。Transformer在性能上超越了现有的最先进自然语言处理（NLP）模型。相比之前的架构，Transformer的训练速度更快，并获得了更高的评估结果。因此，Transformer已成为NLP的关键组成部分。
 
 Transformer模型中的注意力机制的理念是摒弃循环神经网络的特征。在本章中，我们将揭开Vaswani等人（2017年）所描述的Transformer模型的内部机制，并研究其架构的主要组成部分。我们将探索引人入胜的注意力世界，并说明Transformer的关键组件。
 

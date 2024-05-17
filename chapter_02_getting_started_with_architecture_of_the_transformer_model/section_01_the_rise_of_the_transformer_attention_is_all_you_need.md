@@ -638,6 +638,7 @@ FFN的输出跟多头注意力的输出一样需要经过post-LN层，得到整�
 接下来我们来看解码器的结构。
 
 ## Transformer解码器
+:label:`ch2-sec1-decoder`
 
 Transformer模型的解码器与编码器类似，都是通过多层堆叠起来的。每一个解码器层的结构如图 :numref:`ch2-sec1-fig-10` 所示。
 
