@@ -28,7 +28,7 @@ Prefix + Sequence A -> Sequence B
 
 统一的输入格式使得T5中无论需要解决哪个问题,Transformer模型都能产生结果序列。如 :numref:`ch8-sec1-fig-1` 所示,许多自然语言处理任务的输入和输出已经被统一了。
 
-![](screenshots/2024-05-19-16-00-44.png)
+![T5根据前缀处理多种任务](screenshots/2024-05-19-16-00-44.png)
 :label:`ch8-sec1-fig-1`
 
 统一化过程使得我们能够对广泛的NLP任务使用相同的模型、超参数和优化器。
@@ -41,7 +41,7 @@ Prefix + Sequence A -> Sequence B
 
 因此他们选用了原始transformer模型的架构，如 :numref:`ch8-sec-1-fig-2` 所示：
 
-![](screenshots/transformers.svg)
+![T5模型架构保留了原始Transformer架构](screenshots/transformers.svg)
 :label:`ch8-sec-1-fig-2`
 
 谷歌T5团队保留了大部分原始Transformer的架构和术语，但也做了一些轻微的词汇和功能变更:
