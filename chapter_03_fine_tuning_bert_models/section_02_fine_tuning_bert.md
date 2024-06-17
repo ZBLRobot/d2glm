@@ -536,7 +536,7 @@ MCC = \frac{TP\times TN - FP \times FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
 $$
 
 - $TP$表示True Positive（真正），即预测为正，实际标签为正
-- $TN$表示True Negative（真负），即预测为正，实际标签为正
+- $TN$表示True Negative（真负），即预测为负，实际标签为负
 - $FP$表示False Positive（假正），即预测为正，实际标签为负
 - $FN$表示False Negative（假负），即预测为负，实际标签为正
 

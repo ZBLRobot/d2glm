@@ -24,10 +24,10 @@ $$
 
 ### F1评分（F1-score）
 
-在:ref:`chapter-2-section-2-mcc`中，我们介绍了真正、假正、真负和假负的概念，我们来回顾一下：
+在 :ref:`chapter-2-section-2-mcc` 中，我们介绍了真正、假正、真负和假负的概念，我们来回顾一下：
 
 - $TP$表示True Positive（真正），即预测为正，实际标签为正
-- $TN$表示True Negative（真负），即预测为正，实际标签为正
+- $TN$表示True Negative（真负），即预测为负，实际标签为负
 - $FP$表示False Positive（假正），即预测为正，实际标签为负
 - $FN$表示False Negative（假负），即预测为负，实际标签为正
 
@@ -55,7 +55,7 @@ $$
 
 ### 马修斯相关系数（MCC）
 
-在:ref:`chapter-2-section-2-mcc`中我们介绍了马修斯相关系数（Matthews Correlation Coefficient, MCC），其公式为：
+在 :ref:`chapter-2-section-2-mcc` 中我们介绍了马修斯相关系数（Matthews Correlation Coefficient, MCC），其公式为：
 
 $$
 MCC = \frac{TP\times TN - FP \times FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
